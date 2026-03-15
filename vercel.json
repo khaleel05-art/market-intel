@@ -13,7 +13,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "marketintel/$1"
+      "dest": "/$1"
     }
   ]
 }
