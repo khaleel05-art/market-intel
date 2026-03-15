@@ -25,9 +25,8 @@ app.include_router(rag_router, prefix="/api/rag")
 
 # Serve frontend static files (only if running locally)
 if os.getenv("VERCEL") is None:
-    frontend_dir = os.path.join(os.path.dirname(__file__), "..", "marketintel")
-    if os.path.exists(frontend_dir):
-        app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="static")
+    frontend_dir = os.path.dirname(os.path.dirname(__file__))
+    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="static")
 
 handler = Mangum(app)
 
