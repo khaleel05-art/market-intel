@@ -1,0 +1,52 @@
+/* animations.css */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes countUp {
+  from { opacity: 0.3; }
+  to   { opacity: 1; }
+}
+
+/* apply to elements on load */
+.kpi-card     { animation: fadeInUp 0.35s ease both; }
+.kpi-row .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.kpi-row .kpi-card:nth-child(2) { animation-delay: 0.10s; }
+.kpi-row .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+.kpi-row .kpi-card:nth-child(4) { animation-delay: 0.20s; }
+
+.signal-item { animation: fadeInUp 0.3s ease both; }
+
+.status-dot { animation: pulse 2.2s ease-in-out infinite; }
+.ai-tag::before { animation: pulse 2.2s ease-in-out infinite; }
+
+/* hover lift for comp cards */
+.comp-card {
+  transition: border-color 0.15s, transform 0.15s;
+}
+.comp-card:hover { transform: translateY(-1px); }
+
+/* new signal flash */
+@keyframes newSignal {
+  0%   { background: rgba(245,166,35,0.15); }
+  100% { background: var(--card); }
+}
+
+.signal-item.new { animation: newSignal 1.5s ease forwards; }

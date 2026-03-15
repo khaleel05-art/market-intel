@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MarketIntel — Competitive Intelligence Platform</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+  <!-- =============================================
+       TOP BAR
+  ============================================== -->
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-icon" aria-hidden="true"></div>
+      <span class="logo-text">Market<span class="accent">Intel</span></span>
+    </div>
+
+    <div class="status-bar">
+      <span class="agent-status">
+        <span class="status-dot" title="Agent active"></span>
+        AGENT ACTIVE
+      </span>
+      <span class="model-pill">qwen2.5:14b</span>
+      <span class="model-pill">deepseek-r1:8b</span>
+      <span class="stack-label">FastAPI · PostgreSQL</span>
+      <span class="clock" id="clock">--:--:--</span>
+    </div>
+  </header>
+
+  <!-- price ticker -->
+  <div class="ticker-wrap" aria-label="Live price ticker">
+    <div class="ticker-inner" id="tickerInner"></div>
+  </div>
+
+  <!-- =============================================
+       MAIN LAYOUT — sidebar / content / panel
+  ============================================== -->
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" role="navigation" aria-label="Main navigation">
+      <div class="nav-section-label">Navigation</div>
+      <ul class="nav-list">
+        <li class="nav-item active" data-page="dashboard" onclick="navClick(this)">
+          <span class="nav-icon">◈</span> Dashboard
+        </li>
+        <li class="nav-item" data-page="competitors" onclick="navClick(this)">
+          <span class="nav-icon">◎</span> Competitors
+          <span class="nav-badge">6</span>
+        </li>
+        <li class="nav-item" data-page="pricing" onclick="navClick(this)">
+          <span class="nav-icon">◷</span> Pricing Monitor
+        </li>
+        <li class="nav-item" data-page="reviews" onclick="navClick(this)">
+          <span class="nav-icon">◫</span> Review Mining
+        </li>
+        <li class="nav-item" data-page="signals" onclick="navClick(this)">
+          <span class="nav-icon">◬</span> Signal Feed
+          <span class="nav-badge amber">12</span>
+        </li>
+      </ul>
+
+      <div class="nav-section-label" style="margin-top: 10px;">Agentic Layer</div>
+      <ul class="nav-list">
+        <li class="nav-item" data-page="pivot" onclick="navClick(this)">
+          <span class="nav-icon">⬡</span> Auto-Pivot Advisor
+        </li>
+        <li class="nav-item" data-page="strategy" onclick="navClick(this)">
+          <span class="nav-icon">◈</span> Strategy Synthesis
+        </li>
+        <li class="nav-item" data-page="radar" onclick="navClick(this)">
+          <span class="nav-icon">◉</span> Opportunity Radar
+        </li>
+      </ul>
+
+      <div class="nav-section-label" style="margin-top: 10px;">Settings</div>
+      <ul class="nav-list">
+        <li class="nav-item" onclick="navClick(this)"><span class="nav-icon">◻</span> API Config</li>
+        <li class="nav-item" onclick="navClick(this)"><span class="nav-icon">◻</span> Watchlist</li>
+        <li class="nav-item" onclick="navClick(this)"><span class="nav-icon">◻</span> Export</li>
+      </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+
+      <!-- KPI row -->
+      <section class="kpi-row" aria-label="Key performance indicators">
+        <div class="kpi-card" style="--accent: var(--amber)">
+          <div class="kpi-label">Signals Detected</div>
+          <div class="kpi-value" id="kpiSignals">847</div>
+          <div class="kpi-delta delta-up">↑ 34 in last hour</div>
+        </div>
+        <div class="kpi-card" style="--accent: var(--red)">
+          <div class="kpi-label">Price Shifts</div>
+          <div class="kpi-value" id="kpiPriceShifts">23</div>
+          <div class="kpi-delta delta-down">↓ 3 rivals dropped today</div>
+        </div>
+        <div class="kpi-card" style="--accent: var(--cyan)">
+          <div class="kpi-label">Avg Sentiment Δ</div>
+          <div class="kpi-value">−4.2%</div>
+          <div class="kpi-delta delta-down">↓ competitor NPS slipping</div>
+        </div>
+        <div class="kpi-card" style="--accent: var(--green)">
+          <div class="kpi-label">Pivot Opportunities</div>
+          <div class="kpi-value" id="kpiPivots">7</div>
+          <div class="kpi-delta delta-up">↑ 2 new since yesterday</div>
+        </div>
+      </section>
+
+      <!-- Price monitor table -->
+      <section class="chart-card" aria-label="Price shift monitor">
+        <div class="section-head">
+          <span class="section-title">◈ Price Shift Monitor — Last 14 Days</span>
+          <button class="section-action" onclick="exportCSV()">Export CSV ↗</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="priceTable">
+            <thead>
+              <tr>
+                <th>Competitor</th>
+                <th>Category</th>
+                <th>Prev Price</th>
+                <th>Current</th>
+                <th>Change</th>
+                <th>Signal Source</th>
+                <th>Sentiment Link</th>
+              </tr>
+            </thead>
+            <tbody id="priceTableBody">
+              <!-- filled by js/data.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Competitor cards -->
+      <section aria-label="Competitor intelligence">
+        <div class="section-head">
+          <span class="section-title">◎ Competitor Intelligence</span>
+          <button class="section-action" onclick="addCompetitor()">Add competitor ↗</button>
+        </div>
+        <div class="competitor-grid" id="competitorGrid">
+          <!-- filled by js/competitors.js -->
+        </div>
+      </section>
+
+      <!-- Signal feed -->
+      <section aria-label="Live signal feed">
+        <div class="section-head">
+          <span class="section-title">◬ Live Signal Feed</span>
+          <button class="section-action" id="filterBtn" onclick="toggleFilter()">Filter ↗</button>
+        </div>
+        <div class="signal-feed" id="signalFeed">
+          <!-- filled by js/signals.js -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT PANEL -->
+    <aside class="right-panel" aria-label="AI advisor panel">
+      <div class="panel-tab-bar" role="tablist">
+        <button class="panel-tab active" role="tab" aria-selected="true"  onclick="switchTab(this,'ai')">AI Advisor</button>
+        <button class="panel-tab"        role="tab" aria-selected="false" onclick="switchTab(this,'trends')">Trends</button>
+        <button class="panel-tab"        role="tab" aria-selected="false" onclick="switchTab(this,'alerts')">Alerts</button>
+      </div>
+
+      <!-- AI tab -->
+      <div class="panel-body" id="tab-ai">
+        <div class="ai-chat" id="aiChat">
+          <div class="ai-message">
+            <div class="ai-tag">Agent · Qwen2.5:14b</div>
+            <div class="ai-text">
+              <strong>Strategic Brief — Live Analysis</strong><br><br>
+              Three competitors have simultaneously lowered prices. Cross-referencing with review sentiment:
+              <strong>all three show material quality complaints</strong> preceding the cuts.
+              This is a <strong>manufactured value gap</strong> — customers compare on price but are dissatisfied on quality.
+            </div>
+          </div>
+
+          <div class="ai-message">
+            <div class="ai-tag">Pivot Advisor · DeepSeek-R1:8b</div>
+            <div class="ai-text">Recommended pivot strategies based on current market signals:</div>
+            <div class="pivot-list" id="pivotList">
+              <!-- filled by js/advisor.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trends tab -->
+      <div class="panel-body hidden" id="tab-trends">
+        <div class="section-title" style="margin-bottom:14px">◈ Search Volume Trends</div>
+        <div class="trends-list" id="trendsList">
+          <!-- filled by js/trends.js -->
+        </div>
+        <div class="divider"></div>
+        <p class="trend-insight">
+          <span class="cyan-text mono-text">Agent insight:</span>
+          Your brand gains search share as competitors drop. Capitalize with paid search in next 48h window.
+        </p>
+      </div>
+
+      <!-- Alerts tab -->
+      <div class="panel-body hidden" id="tab-alerts">
+        <div class="section-title" style="margin-bottom:14px">⚡ Alert Config</div>
+        <div class="alerts-list" id="alertsList">
+          <!-- filled by js/alerts.js -->
+        </div>
+      </div>
+
+      <!-- Query box — always visible -->
+      <div class="query-wrap">
+        <input
+          type="text"
+          class="query-input"
+          id="queryInput"
+          placeholder="Ask agent: why did rival drop prices?"
+          onkeydown="handleQueryKey(event)"
+          autocomplete="off"
+        />
+        <button class="query-btn" onclick="submitQuery()">ASK ↗</button>
+      </div>
+    </aside>
+
+  </div><!-- /app-layout -->
+
+  <!-- scripts — order matters -->
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/competitors.js"></script>
+  <script src="js/signals.js"></script>
+  <script src="js/advisor.js"></script>
+  <script src="js/trends.js"></script>
+  <script src="js/alerts.js"></script>
+  <script src="js/ticker.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
